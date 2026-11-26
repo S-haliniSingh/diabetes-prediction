@@ -25,7 +25,7 @@ st.markdown("""
     /* Main Background */
     .stApp {
         background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-        color: white;
+        color: beige;
         font-family: 'Inter', sans-serif;
     }
     
@@ -105,7 +105,7 @@ st.markdown("""
     }
     
     .stNumberInput > div > div > input:focus {
-        border-color: #00e676;
+        border-color: #87CEEB;
         box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
         background-color: rgba(0, 0, 0, 0.4) !important;
     }
