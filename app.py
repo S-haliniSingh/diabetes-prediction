@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 import joblib
 import numpy as np
+from fpdf import FPDF
+import datetime
 
 # --- 1. Page Configuration ---
 st.set_page_config(
@@ -13,20 +15,16 @@ st.set_page_config(
 # --- 2. Custom CSS for Premium Design ---
 st.markdown("""
 <style>
-    /* Background */
     .stApp {
         background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
         color: white;
         font-family: 'Inter', sans-serif;
     }
-    
-    /* Main Header Container */
     .header-container {
         text-align: center;
         padding: 20px;
         margin-bottom: 30px;
     }
-    
     .main-title {
         color: #00e676;
         font-size: 42px;
@@ -35,14 +33,11 @@ st.markdown("""
         letter-spacing: 1px;
         text-shadow: 0px 4px 15px rgba(0, 230, 118, 0.3);
     }
-    
     .subtitle {
         font-size: 18px;
         color: #b0bec5;
         font-weight: 400;
     }
-
-    /* Card Style for Inputs */
     .css-card {
         background-color: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
@@ -52,7 +47,6 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.1);
         margin-bottom: 20px;
     }
-    
     .section-title {
         color: #ffffff;
         font-size: 22px;
@@ -62,8 +56,6 @@ st.markdown("""
         padding-bottom: 10px;
         display: inline-block;
     }
-
-    /* Input Labels */
     .stNumberInput label {
         color: #cfd8dc !important;
         font-weight: 500 !important;
@@ -72,8 +64,6 @@ st.markdown("""
         letter-spacing: 1px;
         margin-bottom: 8px !important;
     }
-
-    /* Input Fields */
     .stNumberInput > div > div > input {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
@@ -83,13 +73,10 @@ st.markdown("""
         font-weight: 600;
         font-size: 16px;
     }
-    
     .stNumberInput > div > div > input:focus {
         border-color: #00e676;
         box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
     }
-
-    /* Predict Button */
     .stButton>button {
         background: linear-gradient(90deg, #00e676 0%, #00b0ff 100%);
         color: white;
@@ -104,14 +91,11 @@ st.markdown("""
         text-transform: uppercase;
         letter-spacing: 1px;
     }
-    
     .stButton>button:hover {
         background: linear-gradient(90deg, #00b0ff 0%, #00e676 100%);
         transform: translateY(-4px) scale(1.01);
         box-shadow: 0 8px 25px rgba(0, 230, 118, 0.7);
     }
-    
-    /* Hide Streamlit default menu */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
 </style>
@@ -135,7 +119,6 @@ page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Featu
 # ==========================================
 if page == "🏠 Home (Prediction)":
     
-    # Header
     st.markdown("""
     <div class="header-container">
         <div class="main-title">🩺 Diabetes Predictor</div>
@@ -143,7 +126,6 @@ if page == "🏠 Home (Prediction)":
     </div>
     """, unsafe_allow_html=True)
 
-    # Card Container
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📝 Patient Details</div>', unsafe_allow_html=True)
     
@@ -161,28 +143,84 @@ if page == "🏠 Home (Prediction)":
         dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0, max_value=3.0, value=0.5, format="%.3f")
         age = st.number_input("Age (years)", min_value=1, max_value=120, value=30)
 
-    st.markdown('</div>', unsafe_allow_html=True) # Close Card
+    st.markdown('</div>', unsafe_allow_html=True)
+    st.write("")
 
-    st.write("") # Spacing
-
-    # Button
     empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
     with btn_col:
         predict_button = st.button("Predict Diabetes Risk", use_container_width=True)
 
-    # Result
     if predict_button:
         input_data = np.array([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf, age]])
         scaled_data = scaler.transform(input_data)
+        
+        # Get Prediction and Probability
         prediction = model.predict(scaled_data)
+        probability = model.predict_proba(scaled_data)[0]
+        
+        # Probability of Diabetes (Class 1)
+        risk_percentage = probability[1] * 100
         
         st.divider()
         st.subheader("📊 Prediction Result")
         
+        # Show Result with Probability
         if prediction[0] == 1:
-            st.error("⚠️ **High Risk Detected:** The model predicts a high probability of Diabetes. Please consult a healthcare professional immediately.")
+            st.error(f"⚠️ **High Risk Detected:** The model predicts a **{risk_percentage:.1f}%** probability of Diabetes. Please consult a healthcare professional immediately.")
         else:
-            st.success("✅ **Low Risk:** The model predicts no Diabetes risk based on these details. Keep up the healthy lifestyle!")
+            safe_percentage = probability[0] * 100
+            st.success(f"✅ **Low Risk:** The model predicts a **{safe_percentage:.1f}%** probability of being Non-Diabetic. Keep up the healthy lifestyle!")
+
+        st.write("")
+        
+        # --- PDF Generation Logic ---
+        class PDF(FPDF):
+            def header(self):
+                self.set_font('Arial', 'B', 15)
+                self.cell(0, 10, 'Diabetes Prediction Report', 0, 1, 'C')
+                self.ln(10)
+
+        # Create PDF
+        pdf = PDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        
+        # Report Details
+        date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        pdf.cell(0, 10, f"Date: {date_str}", 0, 1)
+        pdf.cell(0, 10, "--- Patient Details ---", 0, 1)
+        
+        pdf.cell(90, 10, f"Pregnancies: {pregnancies}", 0, 0)
+        pdf.cell(90, 10, f"Insulin: {insulin}", 0, 1)
+        pdf.cell(90, 10, f"Glucose: {glucose} mg/dL", 0, 0)
+        pdf.cell(90, 10, f"BMI: {bmi}", 0, 1)
+        pdf.cell(90, 10, f"Blood Pressure: {blood_pressure} mm Hg", 0, 0)
+        pdf.cell(90, 10, f"Pedigree Function: {dpf}", 0, 1)
+        pdf.cell(90, 10, f"Skin Thickness: {skin_thickness} mm", 0, 0)
+        pdf.cell(90, 10, f"Age: {age} years", 0, 1)
+        
+        pdf.ln(10)
+        pdf.cell(0, 10, "--- Prediction Result ---", 0, 1)
+        
+        result_text = f"High Risk ({risk_percentage:.1f}% probability)" if prediction[0] == 1 else f"Low Risk ({probability[0]*100:.1f}% probability)"
+        pdf.set_font("Arial", 'B', 12)
+        pdf.cell(0, 10, f"Outcome: {result_text}", 0, 1)
+        
+        pdf.set_font("Arial", 'I', 10)
+        pdf.ln(10)
+        pdf.multi_cell(0, 10, "Disclaimer: This report is generated by an AI model for educational purposes only. It is not a substitute for professional medical advice.")
+        
+        # Convert PDF to bytes
+        pdf_output = pdf.output(dest='S').encode('latin-1')
+        
+        # Download Button
+        st.download_button(
+            label="📄 Download PDF Report",
+            data=pdf_output,
+            file_name=f"Diabetes_Report_{datetime.datetime.now().strftime('%Y%m%d')}.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
 
 # ==========================================
 # PAGE 2: FEATURE GUIDE
