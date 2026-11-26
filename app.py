@@ -96,9 +96,9 @@ def load_model():
 
 model, scaler = load_model()
 
-# --- 4. Sidebar Navigation (Yahan se Page Change hoga) ---
+# --- 4. Sidebar Navigation ---
 st.sidebar.title("📌 Navigation")
-page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📖 How to Use"])
+page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Feature Guide", "📖 How to Use"])
 
 # ==========================================
 # PAGE 1: HOME (PREDICTION)
@@ -142,7 +142,53 @@ if page == "🏠 Home (Prediction)":
             st.success("✅ **Low Risk:** The model predicts no Diabetes risk based on these details. Stay healthy!")
 
 # ==========================================
-# PAGE 2: HOW TO USE (GUIDE)
+# PAGE 2: FEATURE GUIDE (NEW PAGE)
+# ==========================================
+elif page == "📊 Feature Guide":
+    st.title("📊 Feature Analysis Guide")
+    st.markdown('<div class="subtitle">Understand which health metrics matter the most and their risk thresholds.</div>', unsafe_allow_html=True)
+    
+    st.info("💡 **Note:** Diabetes is a complex condition. A single high value does not always mean you have diabetes. The model analyzes all these features together to make a prediction.")
+    
+    st.divider()
+    
+    # 1. Model ki Feature Importance nikalna
+    st.markdown("### 🔝 Which features are most important?")
+    st.write("Our Machine Learning model (Random Forest) calculates how much each feature contributes to the prediction:")
+    
+    # Feature names
+    features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']
+    
+    # Model se importance nikalna
+    importances = model.feature_importances_
+    feature_importance_df = pd.DataFrame({'Feature': features, 'Importance': importances})
+    feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
+    
+    # Graph banayein
+    st.bar_chart(feature_importance_df.set_index('Feature'), color="#00e676")
+    
+    st.divider()
+    
+    # 2. Medical Thresholds (Limits)
+    st.markdown("### ⚠️ Risk Thresholds (Medical Guidelines)")
+    st.write("Here are the generally accepted medical limits. If your values are above these, the risk of diabetes increases:")
+    
+    # Dataframe banayein limits ke saath
+    thresholds_data = {
+        "Feature": ["Glucose", "Blood Pressure", "BMI", "Insulin", "Skin Thickness", "Age"],
+        "Normal Range": ["< 140 mg/dL", "< 120 mm Hg", "18.5 - 24.9", "< 140 mu U/ml", "< 25 mm", "< 45 years"],
+        "High Risk (Above)": ["> 140 mg/dL", "> 120 mm Hg", "> 24.9", "> 140 mu U/ml", "> 25 mm", "> 45 years"]
+    }
+    
+    df_thresholds = pd.DataFrame(thresholds_data)
+    
+    # Table ko sundar tarike se dikhayein
+    st.table(df_thresholds)
+    
+    st.warning("🚨 **Important:** If your values are in the 'High Risk' category, please consult a healthcare professional. Do not rely solely on this app for medical diagnosis.")
+
+# ==========================================
+# PAGE 3: HOW TO USE (GUIDE)
 # ==========================================
 elif page == "📖 How to Use":
     st.title("📖 How to Use This App")
