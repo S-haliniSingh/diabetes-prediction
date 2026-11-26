@@ -296,20 +296,49 @@ elif page == "📊 Feature Guide":
     feature_importance_df = pd.DataFrame({'Feature': features, 'Importance': importances})
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
     
-    # Chart Color based on theme
-    chart_color = '#00BFFF' if st.session_state.theme == 'Dark' else '#007BFF'
+  
+       # --- CHART FIX (Horizontal Bar) ---
+    # Colors define karein (Sky Blue to Dark Blue)
+    if st.session_state.theme == 'Dark':
+        chart_colors = ['#00BFFF', '#0099CC', '#007399', '#005C7A', '#004D66', '#003D52', '#002E3D', '#001F29']
+        font_color = "white"
+    else:
+        chart_colors = ['#007BFF', '#0062CC', '#004999', '#002F66', '#001533', '#000000', '#000000', '#000000']
+        font_color = "black"
+
+    fig = px.bar(
+        feature_importance_df, 
+        x='Importance', 
+        y='Feature', 
+        orientation='h', # Horizontal bar ke liye
+        color='Feature',
+        color_discrete_sequence=chart_colors,
+        text_auto='.3f' # Bars ke upar value dikhane ke liye
+    )
     
-    fig = px.bar(feature_importance_df, x='Feature', y='Importance', color_discrete_sequence=[chart_color])
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font_color=text_color,
-        xaxis_title="Features",
-        yaxis_title="Importance Score",
-        margin=dict(l=0, r=0, t=30, b=0)
+        font_color=font_color,
+        xaxis_title="Importance Score",
+        yaxis_title="",
+        showlegend=False, # Legend ki zaroorat nahi hai
+        margin=dict(l=0, r=0, t=10, b=0),
+        height=400
     )
-    st.plotly_chart(fig, use_container_width=True)
     
+    # Bars ko aur sundar banane ke liye
+    fig.update_traces(
+        textposition='outside',
+        marker_line_color='black',
+        marker_line_width=0
+    )
+    
+    # Y-axis ko reverse karein taaki sabse important feature sabse upar dikhe
+    fig.update_yaxes(autorange="reversed")
+
+    st.plotly_chart(fig, use_container_width=True)
+    # ---------------------------------- 
     st.divider()
     
     st.markdown("### ⚠️ Risk Thresholds (Medical Guidelines)")
