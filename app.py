@@ -217,40 +217,88 @@ elif page == "📊 Feature Guide":
     st.markdown(html_table, unsafe_allow_html=True)
     
     st.warning("🚨 **Important:** If your values are in the 'High Risk' category, please consult a healthcare professional. Do not rely solely on this app for medical diagnosis.")
-
 # ==========================================
 # PAGE 3: HOW TO USE (GUIDE)
 # ==========================================
 elif page == "📖 How to Use":
     st.title("📖 How to Use This App")
-    st.markdown('<div class="subtitle">A simple guide for new users to understand how the prediction works.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="subtitle">A simple, step-by-step guide to get the most out of this app.</div>', unsafe_allow_html=True)
     
     st.divider()
 
+    # Custom CSS specifically for this page's cards
     st.markdown("""
-    ### 👋 Welcome!
-    This app uses a Machine Learning model to predict whether a person is at risk of Diabetes based on their medical details. Follow these steps to use the app:
+    <style>
+        .guide-card {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 5px solid #00e676;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .guide-card h3 {
+            color: #00e676;
+            margin-top: 0;
+        }
+        .guide-card p {
+            color: #cfd8dc;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        .guide-list li {
+            color: #cfd8dc;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+        .guide-list strong {
+            color: #ffffff;
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
-    #### 📝 Step 1: Enter Your Details
-    Go to the **Home (Prediction)** page and fill in the input boxes. Here is what each term means:
-    
-    *   **Pregnancies:** How many times you have been pregnant.
-    *   **Glucose Level:** Your blood sugar level (in mg/dL).
-    *   **Blood Pressure:** Your blood pressure reading (in mm Hg).
-    *   **Skin Thickness:** Thickness of the skin fold on your triceps (in mm).
-    *   **Insulin:** Your insulin level (in mu U/ml).
-    *   **BMI:** Body Mass Index (a measure of body fat based on height and weight).
-    *   **Diabetes Pedigree Function:** A score that predicts diabetes risk based on family history.
-    *   **Age:** Your age in years.
+    # Step 1 Card
+    st.markdown("""
+    <div class="guide-card">
+        <h3>👋 Step 1: Enter Your Details</h3>
+        <p>Go to the <b>🏠 Home (Prediction)</b> page and fill in the input boxes. Here is what each medical term means:</p>
+        <ul class="guide-list">
+            <li><strong>Pregnancies:</strong> Number of times you have been pregnant.</li>
+            <li><strong>Glucose Level:</strong> Your blood sugar level (in mg/dL).</li>
+            <li><strong>Blood Pressure:</strong> Your blood pressure reading (in mm Hg).</li>
+            <li><strong>Skin Thickness:</strong> Thickness of the skin fold on your triceps (in mm).</li>
+            <li><strong>Insulin:</strong> Your insulin level (in mu U/ml).</li>
+            <li><strong>BMI:</strong> Body Mass Index (a measure of body fat based on height and weight).</li>
+            <li><strong>Diabetes Pedigree Function:</strong> A score that predicts diabetes risk based on family history.</li>
+            <li><strong>Age:</strong> Your age in years.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-    #### 🔍 Step 2: Click Predict
-    Once all the details are filled, click the **"Predict Diabetes Risk"** button.
+    # Step 2 Card
+    st.markdown("""
+    <div class="guide-card">
+        <h3>🔍 Step 2: Click Predict</h3>
+        <p>Once all the details are filled, simply click the glowing <b>"🔍 Predict Diabetes Risk"</b> button at the bottom of the page.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    #### 📊 Step 3: Read the Result
-    *   **✅ Low Risk (Green):** Based on the data, the model thinks you are currently at low risk.
-    *   **⚠️ High Risk (Red):** The model detects patterns similar to diabetic patients. You should consult a doctor for proper medical advice.
+    # Step 3 Card
+    st.markdown("""
+    <div class="guide-card">
+        <h3>📊 Step 3: Read the Result</h3>
+        <p>After clicking predict, you will get one of two results:</p>
+        <ul class="guide-list">
+            <li><strong>✅ Low Risk (Green):</strong> Based on the data, the model thinks you are currently at low risk for diabetes.</li>
+            <li><strong>⚠️ High Risk (Red):</strong> The model detects patterns similar to diabetic patients. You should consult a doctor for proper medical advice.</li>
+        </ul>
+    </div>
+    """, unsafe_allow_html=True)
 
-    ---
-    ### ⚠️ Disclaimer
-    **This app is for educational and informational purposes only.** It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or qualified health provider regarding any medical condition.
-    """)
+    # Disclaimer Card (Red border for warning)
+    st.markdown("""
+    <div class="guide-card" style="border-left: 5px solid #ff4b4b; background-color: rgba(255, 75, 75, 0.1);">
+        <h3 style="color: #ff4b4b;">⚠️ Important Disclaimer</h3>
+        <p>This app is for <b>educational and informational purposes only</b>. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or qualified health provider regarding any medical condition.</p>
+    </div>
+    """, unsafe_allow_html=True)
