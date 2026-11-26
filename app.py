@@ -10,12 +10,18 @@ import plotly.express as px
 st.set_page_config(
     page_title="Diabetes Risk Checker", 
     page_icon="🩺", 
-    layout="centered"
+    layout="centered",
+    initial_sidebar_state="expanded"
 )
 
-# --- 2. Custom CSS for Premium Design ---
+# --- 2. Custom CSS for Premium UI ---
 st.markdown("""
 <style>
+    /* Hide Streamlit default header, footer and menu */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    
     /* Main Background */
     .stApp {
         background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
@@ -23,55 +29,57 @@ st.markdown("""
         font-family: 'Inter', sans-serif;
     }
     
-    /* Top-Right Header (GitHub icon, etc.) Hide */
-    header {visibility: hidden;}
-    
-    /* Footer (Your Photo/Name) Hide */
-    footer {visibility: hidden;}
-    
-    /* Sidebar Styling (Navigation) */
+    /* Sidebar Styling */
     [data-testid="stSidebar"] {
-        background-color: #1a1a2e;
+        background-color: #1a1a2e !important;
+        border-right: 1px solid rgba(255,255,255,0.1);
     }
-
-    /* Hero Section - Center and Top */
-    .header-container {
+    
+    /* Hero Section */
+    .hero-section {
         text-align: center;
-        padding-top: 10px;
-        margin-bottom: 20px;
+        padding: 20px 0;
+        margin-bottom: 30px;
     }
-    .main-title {
+    
+    .hero-title {
         color: #00e676;
         font-size: 48px;
-        font-weight: 800;
+        font-weight: 900;
         margin-bottom: 10px;
         letter-spacing: 1px;
-        text-shadow: 0px 4px 15px rgba(0, 230, 118, 0.3);
+        text-shadow: 0px 4px 20px rgba(0, 230, 118, 0.4);
     }
-    .subtitle {
+    
+    .hero-subtitle {
         font-size: 18px;
         color: #b0bec5;
         font-weight: 400;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
     }
 
-    /* CSS Card for Inputs */
-    .css-card {
-        background-color: rgba(255, 255, 255, 0.05);
-        border-radius: 15px;
-        padding: 25px;
+    /* Glass Card */
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 16px;
+        padding: 30px;
         box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        margin-bottom: 20px;
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        margin-bottom: 25px;
     }
+    
+    /* Section Title */
     .section-title {
         color: #ffffff;
-        font-size: 22px;
-        font-weight: 600;
-        margin-bottom: 20px;
-        border-bottom: 2px solid #00e676;
-        padding-bottom: 10px;
-        display: inline-block;
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 25px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
     /* Input Labels */
@@ -80,44 +88,56 @@ st.markdown("""
         font-weight: 500 !important;
         font-size: 14px !important;
         text-transform: uppercase;
-        letter-spacing: 1px;
+        letter-spacing: 1.2px;
         margin-bottom: 8px !important;
     }
 
     /* Input Fields */
     .stNumberInput > div > div > input {
-        background-color: #1a1a2e !important;
+        background-color: rgba(0, 0, 0, 0.2) !important;
         color: #ffffff !important;
-        border-radius: 8px;
-        border: 1px solid #4CAF50;
-        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 14px;
         font-weight: 600;
         font-size: 16px;
+        transition: all 0.3s ease;
     }
+    
     .stNumberInput > div > div > input:focus {
         border-color: #00e676;
-        box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+        box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
+        background-color: rgba(0, 0, 0, 0.4) !important;
     }
 
-    /* Gradient Predict Button */
+    /* Primary Button (Gradient) */
     .stButton>button {
-        background: linear-gradient(90deg, #00e676 0%, #00b0ff 100%);
-        color: white;
-        border-radius: 30px;
-        padding: 18px 40px;
-        font-size: 20px;
-        font-weight: 800;
+        background: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+        color: #ffffff;
+        border-radius: 12px;
+        padding: 16px 40px;
+        font-size: 18px;
+        font-weight: 700;
         border: none;
         width: 100%;
-        box-shadow: 0 4px 20px rgba(0, 230, 118, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
         transition: all 0.3s ease;
         text-transform: uppercase;
         letter-spacing: 1px;
     }
+    
     .stButton>button:hover {
-        background: linear-gradient(90deg, #00b0ff 0%, #00e676 100%);
-        transform: translateY(-4px) scale(1.01);
-        box-shadow: 0 8px 25px rgba(0, 230, 118, 0.7);
+        background: linear-gradient(135deg, #00b0ff 0%, #00e676 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5);
+        color: #ffffff;
+    }
+    
+    /* Success/Error boxes */
+    .stAlert {
+        border-radius: 12px;
+        border-left: 5px solid;
+        background-color: rgba(0,0,0,0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -132,24 +152,28 @@ def load_model():
 model, scaler = load_model()
 
 # --- 4. Sidebar Navigation ---
-st.sidebar.title("📌 Navigation")
-page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Feature Guide", "📖 How to Use"])
+with st.sidebar:
+    st.markdown("<h2 style='text-align: center; color: #00e676;'>🩺 Diabetes AI</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    page = st.radio("Navigation Menu", ["🏠 Prediction", "📊 Feature Guide", "📖 How to Use"])
+    st.markdown("---")
+    st.info("This app uses Machine Learning to assess Diabetes risk based on medical inputs.")
 
 # ==========================================
 # PAGE 1: HOME (PREDICTION)
 # ==========================================
-if page == "🏠 Home (Prediction)":
+if page == "🏠 Prediction":
     
     # Hero Section
     st.markdown("""
-    <div class="header-container">
-        <div class="main-title">🩺 Diabetes Predictor</div>
-        <div class="subtitle">AI-powered health assessment. Enter your details below to get instant insights.</div>
+    <div class="hero-section">
+        <div class="hero-title">Diabetes Predictor</div>
+        <div class="hero-subtitle">AI-powered health assessment. Enter your medical details below to get instant, data-driven insights.</div>
     </div>
     """, unsafe_allow_html=True)
 
     # Input Card
-    st.markdown('<div class="css-card">', unsafe_allow_html=True)
+    st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📝 Patient Details</div>', unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
@@ -172,23 +196,19 @@ if page == "🏠 Home (Prediction)":
     # Predict Button
     empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
     with btn_col:
-        predict_button = st.button("Predict Diabetes Risk", use_container_width=True)
+        predict_button = st.button("Analyze Risk", use_container_width=True)
 
     if predict_button:
         input_data = np.array([[pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, dpf, age]])
         scaled_data = scaler.transform(input_data)
         
-        # Get Prediction and Probability
         prediction = model.predict(scaled_data)
         probability = model.predict_proba(scaled_data)[0]
-        
-        # Probability of Diabetes (Class 1)
         risk_percentage = probability[1] * 100
         
         st.divider()
         st.subheader("📊 Prediction Result")
         
-        # Show Result with Probability
         if prediction[0] == 1:
             st.error(f"⚠️ **High Risk Detected:** The model predicts a **{risk_percentage:.1f}%** probability of Diabetes. Please consult a healthcare professional immediately.")
         else:
@@ -234,7 +254,6 @@ if page == "🏠 Home (Prediction)":
         
         pdf_output = bytes(pdf.output())
         
-        # Download Button
         st.download_button(
             label="📄 Download PDF Report",
             data=pdf_output,
@@ -244,7 +263,7 @@ if page == "🏠 Home (Prediction)":
         )
 
 # ==========================================
-# PAGE 2: FEATURE GUIDE (With Fixed Graph)
+# PAGE 2: FEATURE GUIDE
 # ==========================================
 elif page == "📊 Feature Guide":
     st.title("📊 Feature Analysis Guide")
@@ -254,8 +273,8 @@ elif page == "📊 Feature Guide":
     
     st.divider()
     
-    st.markdown("### 🔝 Which features are most important?")
-    st.write("Our Machine Learning model (Random Forest) calculates how much each feature contributes to the prediction:")
+    st.markdown("### 🔝 Feature Importance")
+    st.write("Our Machine Learning model calculates how much each feature contributes to the prediction:")
     
     features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']
     importances = model.feature_importances_
@@ -263,17 +282,16 @@ elif page == "📊 Feature Guide":
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
     
     # --- CHART FIX ---
-    # Yahan humne Plotly ka use kiya hai taaki chart background dark ho
     fig = px.bar(feature_importance_df, x='Feature', y='Importance', color_discrete_sequence=['#00e676'])
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         font_color='white',
         xaxis_title="Features",
-        yaxis_title="Importance Score"
+        yaxis_title="Importance Score",
+        margin=dict(l=0, r=0, t=30, b=0)
     )
     st.plotly_chart(fig, use_container_width=True)
-    # ------------------
     
     st.divider()
     
@@ -333,10 +351,10 @@ elif page == "📖 How to Use":
 
     st.markdown("""
     <style>
-        .guide-card { background-color: rgba(255, 255, 255, 0.05); border-left: 5px solid #00e676; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .guide-card h3 { color: #00e676; margin-top: 0; }
+        .guide-card { background-color: rgba(255, 255, 255, 0.03); border-left: 4px solid #00e676; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
+        .guide-card h3 { color: #00e676; margin-top: 0; font-size: 20px; }
         .guide-card p { color: #cfd8dc; font-size: 16px; line-height: 1.6; }
-        .guide-list li { color: #cfd8dc; margin-bottom: 8px; font-size: 15px; }
+        .guide-list li { color: #cfd8dc; margin-bottom: 10px; font-size: 15px; }
         .guide-list strong { color: #ffffff; }
     </style>
     """, unsafe_allow_html=True)
@@ -344,7 +362,7 @@ elif page == "📖 How to Use":
     st.markdown("""
     <div class="guide-card">
         <h3>👋 Step 1: Enter Your Details</h3>
-        <p>Go to the <b>🏠 Home (Prediction)</b> page and fill in the input boxes. Here is what each medical term means:</p>
+        <p>Go to the <b>🏠 Prediction</b> page and fill in the input boxes. Here is what each medical term means:</p>
         <ul class="guide-list">
             <li><strong>Pregnancies:</strong> Number of times you have been pregnant.</li>
             <li><strong>Glucose Level:</strong> Your blood sugar level (in mg/dL).</li>
@@ -360,8 +378,8 @@ elif page == "📖 How to Use":
 
     st.markdown("""
     <div class="guide-card">
-        <h3>🔍 Step 2: Click Predict</h3>
-        <p>Once all the details are filled, simply click the glowing <b>"Predict Diabetes Risk"</b> button at the bottom of the page.</p>
+        <h3>🔍 Step 2: Analyze Risk</h3>
+        <p>Once all the details are filled, simply click the glowing <b>"Analyze Risk"</b> button at the bottom of the page.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -377,7 +395,7 @@ elif page == "📖 How to Use":
     """, unsafe_allow_html=True)
 
     st.markdown("""
-    <div class="guide-card" style="border-left: 5px solid #ff4b4b; background-color: rgba(255, 75, 75, 0.1);">
+    <div class="guide-card" style="border-left: 4px solid #ff4b4b; background-color: rgba(255, 75, 75, 0.05);">
         <h3 style="color: #ff4b4b;">⚠️ Important Disclaimer</h3>
         <p>This app is for <b>educational and informational purposes only</b>. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or qualified health provider regarding any medical condition.</p>
     </div>
