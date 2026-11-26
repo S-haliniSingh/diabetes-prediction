@@ -4,6 +4,7 @@ import joblib
 import numpy as np
 from fpdf import FPDF
 import datetime
+import plotly.express as px
 
 # --- 1. Page Configuration ---
 st.set_page_config(
@@ -12,62 +13,36 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- 2. PWA (Install App) Logic ---
-# Ye script phone mein "Install App" ka button dikhata hai
-install_script = """
-<script>
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        
-        const installBtn = document.createElement('button');
-        installBtn.innerText = '📲 Install App';
-        installBtn.style.position = 'fixed';
-        installBtn.style.bottom = '20px';
-        installBtn.style.right = '20px';
-        installBtn.style.zIndex = '999';
-        installBtn.style.padding = '12px 20px';
-        installBtn.style.backgroundColor = '#00e676';
-        installBtn.style.color = 'white';
-        installBtn.style.border = 'none';
-        installBtn.style.borderRadius = '30px';
-        installBtn.style.fontWeight = 'bold';
-        installBtn.style.cursor = 'pointer';
-        installBtn.style.boxShadow = '0 4px 15px rgba(0,230,118,0.5)';
-        installBtn.style.fontSize = '16px';
-        
-        installBtn.onclick = async () => {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                deferredPrompt = null;
-                installBtn.style.display = 'none';
-            }
-        };
-        
-        document.body.appendChild(installBtn);
-    });
-</script>
-"""
-st.components.v1.html(install_script, height=0)
-
-# --- 3. Custom CSS for Premium Design ---
+# --- 2. Custom CSS for Premium Design ---
 st.markdown("""
 <style>
+    /* Main Background */
     .stApp {
         background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
         color: white;
         font-family: 'Inter', sans-serif;
     }
+    
+    /* Top-Right Header (GitHub icon, etc.) Hide */
+    header {visibility: hidden;}
+    
+    /* Footer (Your Photo/Name) Hide */
+    footer {visibility: hidden;}
+    
+    /* Sidebar Styling (Navigation) */
+    [data-testid="stSidebar"] {
+        background-color: #1a1a2e;
+    }
+
+    /* Hero Section - Center and Top */
     .header-container {
         text-align: center;
-        padding: 20px;
-        margin-bottom: 30px;
+        padding-top: 10px;
+        margin-bottom: 20px;
     }
     .main-title {
         color: #00e676;
-        font-size: 42px;
+        font-size: 48px;
         font-weight: 800;
         margin-bottom: 10px;
         letter-spacing: 1px;
@@ -78,6 +53,8 @@ st.markdown("""
         color: #b0bec5;
         font-weight: 400;
     }
+
+    /* CSS Card for Inputs */
     .css-card {
         background-color: rgba(255, 255, 255, 0.05);
         border-radius: 15px;
@@ -96,6 +73,8 @@ st.markdown("""
         padding-bottom: 10px;
         display: inline-block;
     }
+
+    /* Input Labels */
     .stNumberInput label {
         color: #cfd8dc !important;
         font-weight: 500 !important;
@@ -104,6 +83,8 @@ st.markdown("""
         letter-spacing: 1px;
         margin-bottom: 8px !important;
     }
+
+    /* Input Fields */
     .stNumberInput > div > div > input {
         background-color: #1a1a2e !important;
         color: #ffffff !important;
@@ -117,6 +98,8 @@ st.markdown("""
         border-color: #00e676;
         box-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
     }
+
+    /* Gradient Predict Button */
     .stButton>button {
         background: linear-gradient(90deg, #00e676 0%, #00b0ff 100%);
         color: white;
@@ -136,12 +119,10 @@ st.markdown("""
         transform: translateY(-4px) scale(1.01);
         box-shadow: 0 8px 25px rgba(0, 230, 118, 0.7);
     }
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
-# --- 4. Load Model ---
+# --- 3. Load Model ---
 @st.cache_resource
 def load_model():
     model = joblib.load("model/diabetes_model.pkl")
@@ -150,7 +131,7 @@ def load_model():
 
 model, scaler = load_model()
 
-# --- 5. Sidebar Navigation ---
+# --- 4. Sidebar Navigation ---
 st.sidebar.title("📌 Navigation")
 page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Feature Guide", "📖 How to Use"])
 
@@ -159,6 +140,7 @@ page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Featu
 # ==========================================
 if page == "🏠 Home (Prediction)":
     
+    # Hero Section
     st.markdown("""
     <div class="header-container">
         <div class="main-title">🩺 Diabetes Predictor</div>
@@ -166,6 +148,7 @@ if page == "🏠 Home (Prediction)":
     </div>
     """, unsafe_allow_html=True)
 
+    # Input Card
     st.markdown('<div class="css-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📝 Patient Details</div>', unsafe_allow_html=True)
     
@@ -186,6 +169,7 @@ if page == "🏠 Home (Prediction)":
     st.markdown('</div>', unsafe_allow_html=True)
     st.write("")
 
+    # Predict Button
     empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
     with btn_col:
         predict_button = st.button("Predict Diabetes Risk", use_container_width=True)
@@ -220,12 +204,10 @@ if page == "🏠 Home (Prediction)":
                 self.cell(0, 10, 'Diabetes Prediction Report', 0, 1, 'C')
                 self.ln(10)
 
-        # Create PDF
         pdf = PDF()
         pdf.add_page()
         pdf.set_font("Helvetica", size=12)
         
-        # Report Details
         date_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         pdf.cell(0, 10, f"Date: {date_str}", 0, 1)
         pdf.cell(0, 10, "--- Patient Details ---", 0, 1)
@@ -250,7 +232,6 @@ if page == "🏠 Home (Prediction)":
         pdf.ln(10)
         pdf.multi_cell(0, 10, "Disclaimer: This report is generated by an AI model for educational purposes only. It is not a substitute for professional medical advice.")
         
-        # Convert PDF to bytes (New fpdf2 method)
         pdf_output = bytes(pdf.output())
         
         # Download Button
@@ -263,7 +244,7 @@ if page == "🏠 Home (Prediction)":
         )
 
 # ==========================================
-# PAGE 2: FEATURE GUIDE
+# PAGE 2: FEATURE GUIDE (With Fixed Graph)
 # ==========================================
 elif page == "📊 Feature Guide":
     st.title("📊 Feature Analysis Guide")
@@ -281,7 +262,18 @@ elif page == "📊 Feature Guide":
     feature_importance_df = pd.DataFrame({'Feature': features, 'Importance': importances})
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
     
-    st.bar_chart(feature_importance_df.set_index('Feature'), color="#00e676")
+    # --- CHART FIX ---
+    # Yahan humne Plotly ka use kiya hai taaki chart background dark ho
+    fig = px.bar(feature_importance_df, x='Feature', y='Importance', color_discrete_sequence=['#00e676'])
+    fig.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='white',
+        xaxis_title="Features",
+        yaxis_title="Importance Score"
+    )
+    st.plotly_chart(fig, use_container_width=True)
+    # ------------------
     
     st.divider()
     
