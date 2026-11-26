@@ -14,105 +14,135 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# --- 2. Custom CSS for Premium UI ---
-st.markdown("""
+# --- 2. Session State for Theme ---
+# Agar pehli baar app khul rahi hai, to default theme Dark rakhein
+if 'theme' not in st.session_state:
+    st.session_state.theme = 'Dark'
+
+# --- 3. Sidebar Navigation & Theme Toggle ---
+with st.sidebar:
+    st.markdown("<h2 style='text-align: center; color: #00BFFF;'>🩺 Diabetes AI</h2>", unsafe_allow_html=True)
+    st.markdown("---")
+    
+    # Theme Toggle Button
+    theme_choice = st.toggle("🌙 Dark Mode", value=(st.session_state.theme == 'Dark'))
+    st.session_state.theme = 'Dark' if theme_choice else 'Light'
+    
+    st.markdown("---")
+    
+    # Navigation Menu
+    page = st.radio("Navigation Menu", ["🏠 Prediction", "📊 Feature Guide", "📖 How to Use"])
+    st.markdown("---")
+    st.info("This app uses Machine Learning to assess Diabetes risk based on medical inputs.")
+
+# --- 4. Custom CSS based on Theme Selection ---
+if st.session_state.theme == 'Dark':
+    # DARK THEME (Black & Sky Blue)
+    bg_color = "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)"
+    text_color = "#ffffff"
+    subtext_color = "#b0bec5"
+    card_bg = "rgba(255, 255, 255, 0.05)"
+    card_border = "rgba(255, 255, 255, 0.1)"
+    input_bg = "rgba(0, 0, 0, 0.2)"
+    input_text = "#ffffff"
+    primary_color = "#00BFFF" # Sky Blue
+    sidebar_bg = "#1a1a2e"
+else:
+    # LIGHT THEME (White & Black)
+    bg_color = "#f4f7f6"
+    text_color = "#1a1a2e"
+    subtext_color = "#555555"
+    card_bg = "#ffffff"
+    card_border = "#e0e0e0"
+    input_bg = "#f9f9f9"
+    input_text = "#333333"
+    primary_color = "#007BFF" # Standard Blue for Light mode
+    sidebar_bg = "#ffffff"
+
+st.markdown(f"""
 <style>
-    /* Hide Streamlit default header, footer and menu */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    #MainMenu {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    header {{visibility: hidden;}}
     
-    /* Main Background */
-    .stApp {
-        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
-        color: beige;
+    .stApp {{
+        background: {bg_color};
+        color: {text_color};
         font-family: 'Inter', sans-serif;
-    }
+    }}
     
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #1a1a2e !important;
-        border-right: 1px solid rgba(255,255,255,0.1);
-    }
+    [data-testid="stSidebar"] {{
+        background-color: {sidebar_bg} !important;
+        border-right: 1px solid {card_border};
+    }}
     
-    /* Hero Section */
-    .hero-section {
+    .hero-section {{
         text-align: center;
         padding: 20px 0;
         margin-bottom: 30px;
-    }
+    }}
     
-    .hero-title {
-        color: #00e676;
+    .hero-title {{
+        color: {primary_color};
         font-size: 48px;
         font-weight: 900;
         margin-bottom: 10px;
         letter-spacing: 1px;
-        text-shadow: 0px 4px 20px rgba(0, 230, 118, 0.4);
-    }
+        text-shadow: 0px 4px 20px {primary_color}66; 
+    }}
     
-    .hero-subtitle {
+    .hero-subtitle {{
         font-size: 18px;
-        color: #b0bec5;
+        color: {subtext_color};
         font-weight: 400;
         max-width: 600px;
         margin: 0 auto;
         line-height: 1.6;
-    }
+    }}
 
-    /* Glass Card */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
+    .glass-card {{
+        background: {card_bg};
         border-radius: 16px;
         padding: 30px;
-        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
+        border: 1px solid {card_border};
         margin-bottom: 25px;
-    }
+    }}
     
-    /* Section Title */
-    .section-title {
-        color: #ffffff;
+    .section-title {{
+        color: {text_color};
         font-size: 24px;
         font-weight: 700;
         margin-bottom: 25px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
+    }}
 
-    /* Input Labels */
-    .stNumberInput label {
-        color: #cfd8dc !important;
-        font-weight: 500 !important;
+    .stNumberInput label {{
+        color: {subtext_color} !important;
+        font-weight: 600 !important;
         font-size: 14px !important;
         text-transform: uppercase;
-        letter-spacing: 1.2px;
         margin-bottom: 8px !important;
-    }
+    }}
 
-    /* Input Fields */
-    .stNumberInput > div > div > input {
-        background-color: rgba(0, 0, 0, 0.2) !important;
-        color: #ffffff !important;
+    .stNumberInput > div > div > input {{
+        background-color: {input_bg} !important;
+        color: {input_text} !important;
         border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        border: 1px solid {card_border};
         padding: 14px;
         font-weight: 600;
         font-size: 16px;
         transition: all 0.3s ease;
-    }
+    }}
     
-    .stNumberInput > div > div > input:focus {
-        border-color: #87CEEB;
-        box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
-        background-color: rgba(0, 0, 0, 0.4) !important;
-    }
+    .stNumberInput > div > div > input:focus {{
+        border-color: {primary_color};
+        box-shadow: 0 0 0 2px {primary_color}44;
+    }}
 
-    /* Primary Button (Gradient) */
-    .stButton>button {
-        background: linear-gradient(135deg, #00e676 0%, #00b0ff 100%);
+    .stButton>button {{
+        background: linear-gradient(135deg, {primary_color} 0%, #007BFF 100%);
         color: #ffffff;
         border-radius: 12px;
         padding: 16px 40px;
@@ -120,29 +150,30 @@ st.markdown("""
         font-weight: 700;
         border: none;
         width: 100%;
-        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.3);
+        box-shadow: 0 4px 15px {primary_color}55;
         transition: all 0.3s ease;
         text-transform: uppercase;
-        letter-spacing: 1px;
-    }
+    }}
     
-    .stButton>button:hover {
-        background: linear-gradient(135deg, #00b0ff 0%, #00e676 100%);
+    .stButton>button:hover {{
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.5);
-        color: #ffffff;
-    }
+        box-shadow: 0 6px 20px {primary_color}88;
+    }}
     
-    /* Success/Error boxes */
-    .stAlert {
-        border-radius: 12px;
-        border-left: 5px solid;
-        background-color: rgba(0,0,0,0.2);
-    }
+    .guide-card {{ 
+        background-color: {card_bg}; 
+        border-left: 4px solid {primary_color}; 
+        border-radius: 12px; 
+        padding: 25px; 
+        margin-bottom: 20px; 
+    }}
+    .guide-card h3 {{ color: {primary_color}; }}
+    .guide-card p, .guide-list li {{ color: {text_color}; }}
+    
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. Load Model ---
+# --- 5. Load Model ---
 @st.cache_resource
 def load_model():
     model = joblib.load("model/diabetes_model.pkl")
@@ -151,28 +182,18 @@ def load_model():
 
 model, scaler = load_model()
 
-# --- 4. Sidebar Navigation ---
-with st.sidebar:
-    st.markdown("<h2 style='text-align: center; color: #00e676;'>🩺 Diabetes AI</h2>", unsafe_allow_html=True)
-    st.markdown("---")
-    page = st.radio("Navigation Menu", ["🏠 Prediction", "📊 Feature Guide", "📖 How to Use"])
-    st.markdown("---")
-    st.info("This app uses Machine Learning to assess Diabetes risk based on medical inputs.")
-
 # ==========================================
 # PAGE 1: HOME (PREDICTION)
 # ==========================================
 if page == "🏠 Prediction":
     
-    # Hero Section
-    st.markdown("""
+    st.markdown(f"""
     <div class="hero-section">
         <div class="hero-title">Diabetes Predictor</div>
         <div class="hero-subtitle">AI-powered health assessment. Enter your medical details below to get instant, data-driven insights.</div>
     </div>
     """, unsafe_allow_html=True)
 
-    # Input Card
     st.markdown('<div class="glass-card">', unsafe_allow_html=True)
     st.markdown('<div class="section-title">📝 Patient Details</div>', unsafe_allow_html=True)
     
@@ -193,7 +214,6 @@ if page == "🏠 Prediction":
     st.markdown('</div>', unsafe_allow_html=True)
     st.write("")
 
-    # Predict Button
     empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
     with btn_col:
         predict_button = st.button("Analyze Risk", use_container_width=True)
@@ -217,7 +237,7 @@ if page == "🏠 Prediction":
 
         st.write("")
         
-        # --- PDF Generation Logic ---
+        # --- PDF Generation ---
         class PDF(FPDF):
             def header(self):
                 self.set_font('Helvetica', 'B', 15)
@@ -250,7 +270,7 @@ if page == "🏠 Prediction":
         
         pdf.set_font("Helvetica", 'I', 10)
         pdf.ln(10)
-        pdf.multi_cell(0, 10, "Disclaimer: This report is generated by an AI model for educational purposes only. It is not a substitute for professional medical advice.")
+        pdf.multi_cell(0, 10, "Disclaimer: This report is generated by an AI model for educational purposes only.")
         
         pdf_output = bytes(pdf.output())
         
@@ -267,26 +287,23 @@ if page == "🏠 Prediction":
 # ==========================================
 elif page == "📊 Feature Guide":
     st.title("📊 Feature Analysis Guide")
-    st.markdown('<div class="subtitle">Understand which health metrics matter the most and their risk thresholds.</div>', unsafe_allow_html=True)
-    
-    st.info("💡 **Note:** Diabetes is a complex condition. A single high value does not always mean you have diabetes. The model analyzes all these features together to make a prediction.")
+    st.markdown(f'<div class="subtitle" style="color:{subtext_color};">Understand which health metrics matter the most.</div>', unsafe_allow_html=True)
     
     st.divider()
-    
-    st.markdown("### 🔝 Feature Importance")
-    st.write("Our Machine Learning model calculates how much each feature contributes to the prediction:")
     
     features = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']
     importances = model.feature_importances_
     feature_importance_df = pd.DataFrame({'Feature': features, 'Importance': importances})
     feature_importance_df = feature_importance_df.sort_values(by='Importance', ascending=False)
     
-    # --- CHART FIX ---
-    fig = px.bar(feature_importance_df, x='Feature', y='Importance', color_discrete_sequence=['#00e676'])
+    # Chart Color based on theme
+    chart_color = '#00BFFF' if st.session_state.theme == 'Dark' else '#007BFF'
+    
+    fig = px.bar(feature_importance_df, x='Feature', y='Importance', color_discrete_sequence=[chart_color])
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font_color='white',
+        font_color=text_color,
         xaxis_title="Features",
         yaxis_title="Importance Score",
         margin=dict(l=0, r=0, t=30, b=0)
@@ -296,107 +313,44 @@ elif page == "📊 Feature Guide":
     st.divider()
     
     st.markdown("### ⚠️ Risk Thresholds (Medical Guidelines)")
-    st.write("Here are the generally accepted medical limits. If your values are above these, the risk of diabetes increases:")
     
-    html_table = """
-    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; color: white; font-size: 16px;">
-        <tr style="background-color: #1a1a2e; color: #00e676;">
-            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">Feature</th>
-            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">Normal Range</th>
-            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">High Risk (Above)</th>
+    # Table Color based on theme
+    th_color = '#00BFFF' if st.session_state.theme == 'Dark' else '#007BFF'
+    td_border = '#555' if st.session_state.theme == 'Dark' else '#ccc'
+    
+    html_table = f"""
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; color: {text_color}; font-size: 16px;">
+        <tr style="background-color: {card_bg}; color: {th_color};">
+            <th style="padding: 12px; border: 1px solid {th_color}; text-align: left;">Feature</th>
+            <th style="padding: 12px; border: 1px solid {th_color}; text-align: left;">Normal Range</th>
+            <th style="padding: 12px; border: 1px solid {th_color}; text-align: left;">High Risk (Above)</th>
         </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">Glucose</td>
-            <td style="padding: 12px; border: 1px solid #555;">&lt; 140 mg/dL</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 140 mg/dL</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">Blood Pressure</td>
-            <td style="padding: 12px; border: 1px solid #555;">&lt; 120 mm Hg</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 120 mm Hg</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">BMI</td>
-            <td style="padding: 12px; border: 1px solid #555;">18.5 - 24.9</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 24.9</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">Insulin</td>
-            <td style="padding: 12px; border: 1px solid #555;">&lt; 140 mu U/ml</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 140 mu U/ml</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">Skin Thickness</td>
-            <td style="padding: 12px; border: 1px solid #555;">&lt; 25 mm</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 25 mm</td>
-        </tr>
-        <tr>
-            <td style="padding: 12px; border: 1px solid #555;">Age</td>
-            <td style="padding: 12px; border: 1px solid #555;">&lt; 45 years</td>
-            <td style="padding: 12px; border: 1px solid #555;">&gt; 45 years</td>
-        </tr>
+        <tr><td style="padding: 12px; border: 1px solid {td_border};">Glucose</td><td style="padding: 12px; border: 1px solid {td_border};">&lt; 140</td><td style="padding: 12px; border: 1px solid {td_border};">&gt; 140</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid {td_border};">Blood Pressure</td><td style="padding: 12px; border: 1px solid {td_border};">&lt; 120</td><td style="padding: 12px; border: 1px solid {td_border};">&gt; 120</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid {td_border};">BMI</td><td style="padding: 12px; border: 1px solid {td_border};">18.5 - 24.9</td><td style="padding: 12px; border: 1px solid {td_border};">&gt; 24.9</td></tr>
+        <tr><td style="padding: 12px; border: 1px solid {td_border};">Insulin</td><td style="padding: 12px; border: 1px solid {td_border};">&lt; 140</td><td style="padding: 12px; border: 1px solid {td_border};">&gt; 140</td></tr>
     </table>
     """
     st.markdown(html_table, unsafe_allow_html=True)
-    st.warning("🚨 **Important:** If your values are in the 'High Risk' category, please consult a healthcare professional.")
 
 # ==========================================
 # PAGE 3: HOW TO USE
 # ==========================================
 elif page == "📖 How to Use":
     st.title("📖 How to Use This App")
-    st.markdown('<div class="subtitle">A simple, step-by-step guide to get the most out of this app.</div>', unsafe_allow_html=True)
-    
     st.divider()
-
-    st.markdown("""
-    <style>
-        .guide-card { background-color: rgba(255, 255, 255, 0.03); border-left: 4px solid #00e676; border-radius: 12px; padding: 25px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); backdrop-filter: blur(10px); }
-        .guide-card h3 { color: #00e676; margin-top: 0; font-size: 20px; }
-        .guide-card p { color: #cfd8dc; font-size: 16px; line-height: 1.6; }
-        .guide-list li { color: #cfd8dc; margin-bottom: 10px; font-size: 15px; }
-        .guide-list strong { color: #ffffff; }
-    </style>
-    """, unsafe_allow_html=True)
 
     st.markdown("""
     <div class="guide-card">
         <h3>👋 Step 1: Enter Your Details</h3>
-        <p>Go to the <b>🏠 Prediction</b> page and fill in the input boxes. Here is what each medical term means:</p>
-        <ul class="guide-list">
-            <li><strong>Pregnancies:</strong> Number of times you have been pregnant.</li>
-            <li><strong>Glucose Level:</strong> Your blood sugar level (in mg/dL).</li>
-            <li><strong>Blood Pressure:</strong> Your blood pressure reading (in mm Hg).</li>
-            <li><strong>Skin Thickness:</strong> Thickness of the skin fold on your triceps (in mm).</li>
-            <li><strong>Insulin:</strong> Your insulin level (in mu U/ml).</li>
-            <li><strong>BMI:</strong> Body Mass Index (a measure of body fat based on height and weight).</li>
-            <li><strong>Diabetes Pedigree Function:</strong> A score that predicts diabetes risk based on family history.</li>
-            <li><strong>Age:</strong> Your age in years.</li>
-        </ul>
+        <p>Go to the <b>🏠 Prediction</b> page and fill in the input boxes.</p>
     </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
     <div class="guide-card">
         <h3>🔍 Step 2: Analyze Risk</h3>
-        <p>Once all the details are filled, simply click the glowing <b>"Analyze Risk"</b> button at the bottom of the page.</p>
+        <p>Once all the details are filled, simply click the glowing <b>"Analyze Risk"</b> button.</p>
     </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="guide-card">
-        <h3>📊 Step 3: Read the Result</h3>
-        <p>After clicking predict, you will get one of two results:</p>
-        <ul class="guide-list">
-            <li><strong>✅ Low Risk (Green):</strong> Based on the data, the model thinks you are currently at low risk for diabetes.</li>
-            <li><strong>⚠️ High Risk (Red):</strong> The model detects patterns similar to diabetic patients. You should consult a doctor for proper medical advice.</li>
-        </ul>
-    </div>
-    """, unsafe_allow_html=True)
-
-    st.markdown("""
-    <div class="guide-card" style="border-left: 4px solid #ff4b4b; background-color: rgba(255, 75, 75, 0.05);">
+    <div class="guide-card" style="border-left: 4px solid #ff4b4b;">
         <h3 style="color: #ff4b4b;">⚠️ Important Disclaimer</h3>
-        <p>This app is for <b>educational and informational purposes only</b>. It is not a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or qualified health provider regarding any medical condition.</p>
+        <p>This app is for <b>educational purposes only</b>. Consult a doctor for medical advice.</p>
     </div>
     """, unsafe_allow_html=True)
