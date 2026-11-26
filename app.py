@@ -12,7 +12,47 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- 2. Custom CSS for Premium Design ---
+# --- 2. PWA (Install App) Logic ---
+# Ye script phone mein "Install App" ka button dikhata hai
+install_script = """
+<script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        const installBtn = document.createElement('button');
+        installBtn.innerText = '📲 Install App';
+        installBtn.style.position = 'fixed';
+        installBtn.style.bottom = '20px';
+        installBtn.style.right = '20px';
+        installBtn.style.zIndex = '999';
+        installBtn.style.padding = '12px 20px';
+        installBtn.style.backgroundColor = '#00e676';
+        installBtn.style.color = 'white';
+        installBtn.style.border = 'none';
+        installBtn.style.borderRadius = '30px';
+        installBtn.style.fontWeight = 'bold';
+        installBtn.style.cursor = 'pointer';
+        installBtn.style.boxShadow = '0 4px 15px rgba(0,230,118,0.5)';
+        installBtn.style.fontSize = '16px';
+        
+        installBtn.onclick = async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        };
+        
+        document.body.appendChild(installBtn);
+    });
+</script>
+"""
+st.components.v1.html(install_script, height=0)
+
+# --- 3. Custom CSS for Premium Design ---
 st.markdown("""
 <style>
     .stApp {
@@ -101,7 +141,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. Load Model ---
+# --- 4. Load Model ---
 @st.cache_resource
 def load_model():
     model = joblib.load("model/diabetes_model.pkl")
@@ -110,7 +150,7 @@ def load_model():
 
 model, scaler = load_model()
 
-# --- 4. Sidebar Navigation ---
+# --- 5. Sidebar Navigation ---
 st.sidebar.title("📌 Navigation")
 page = st.sidebar.radio("Select a page:", ["🏠 Home (Prediction)", "📊 Feature Guide", "📖 How to Use"])
 
@@ -213,7 +253,7 @@ if page == "🏠 Home (Prediction)":
         # Convert PDF to bytes (New fpdf2 method)
         pdf_output = bytes(pdf.output())
         
-        # Download Button (Indentation Fixed)
+        # Download Button
         st.download_button(
             label="📄 Download PDF Report",
             data=pdf_output,
