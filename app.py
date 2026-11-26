@@ -7,59 +7,79 @@ import numpy as np
 st.set_page_config(
     page_title="Diabetes Risk Checker", 
     page_icon="🩺", 
-    layout="centered"
+    layout="centered" # Layout ko center karne ke liye
 )
 
 # --- 2. Custom CSS for Modern Design ---
 st.markdown("""
 <style>
-    /* Main background color */
+    /* Background */
     .stApp {
-        background: linear-gradient(135deg, #1e1e2f 0%, #2a2a40 100%);
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
         color: white;
     }
     
-    /* Title styling */
+    /* Title */
     h1 {
-        color: #4CAF50;
+        color: #00e676;
         text-align: center;
         font-family: 'Helvetica Neue', sans-serif;
         font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
     }
     
-    /* Subtitle styling */
+    /* Subtitle */
     .subtitle {
         text-align: center;
         font-size: 18px;
-        color: #b0b0b0;
+        color: #cfd8dc;
         margin-bottom: 30px;
     }
     
-    /* Input box styling */
+    /* Input Fields */
     .stNumberInput > div > div > input {
         background-color: #ffffff;
         color: #333333;
         border-radius: 10px;
-        border: 1px solid #4CAF50;
+        border: 2px solid #00e676;
         padding: 10px;
+        font-weight: bold;
     }
     
-    /* Button styling */
+    /* Select Box */
+    .stSelectbox > div > div > div {
+        background-color: #ffffff;
+        color: #333333;
+        border-radius: 10px;
+        border: 2px solid #00e676;
+    }
+
+    /* Predict Button (Gradient) */
     .stButton>button {
-        background: linear-gradient(90deg, #4CAF50 0%, #45a049 100%);
+        background: linear-gradient(90deg, #00e676 0%, #00b0ff 100%);
         color: white;
-        border-radius: 25px;
-        padding: 12px 30px;
-        font-size: 18px;
+        border-radius: 30px;
+        padding: 15px 40px;
+        font-size: 20px;
         font-weight: bold;
         border: none;
         width: 100%;
-        transition: 0.3s;
+        box-shadow: 0 4px 15px rgba(0, 230, 118, 0.4);
+        transition: all 0.3s ease;
     }
     
+    /* Button Hover Effect */
     .stButton>button:hover {
-        background: linear-gradient(90deg, #45a049 0%, #4CAF50 100%);
-        transform: scale(1.02);
+        background: linear-gradient(90deg, #00b0ff 0%, #00e676 100%);
+        transform: translateY(-3px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(0, 230, 118, 0.6);
+    }
+    
+    /* Center align sections */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 800px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -78,7 +98,7 @@ st.title("🩺 Diabetes Prediction App")
 st.markdown('<div class="subtitle">Enter your medical details below to assess your risk of diabetes.</div>', unsafe_allow_html=True)
 
 # --- 5. Input Fields in Columns ---
-st.markdown("### 📝 Basic Details")
+st.markdown("### 📝 Patient Details")
 col1, col2 = st.columns(2)
 
 with col1:
@@ -95,8 +115,10 @@ with col2:
 
 st.divider()
 
-# --- 6. Predict Button ---
+# --- 6. Predict Button (Center mein laane ke liye) ---
+# Ye 3 columns banata hai: [Khaali, Button, Khaali]
 empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
+
 with btn_col:
     predict_button = st.button("🔍 Predict Diabetes Risk", use_container_width=True)
 
