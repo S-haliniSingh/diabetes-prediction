@@ -169,21 +169,52 @@ elif page == "📊 Feature Guide":
     
     st.divider()
     
-    # 2. Medical Thresholds (Limits)
+    # 2. Medical Thresholds (Limits) using HTML Table
     st.markdown("### ⚠️ Risk Thresholds (Medical Guidelines)")
     st.write("Here are the generally accepted medical limits. If your values are above these, the risk of diabetes increases:")
     
-    # Dataframe banayein limits ke saath
-    thresholds_data = {
-        "Feature": ["Glucose", "Blood Pressure", "BMI", "Insulin", "Skin Thickness", "Age"],
-        "Normal Range": ["< 140 mg/dL", "< 120 mm Hg", "18.5 - 24.9", "< 140 mu U/ml", "< 25 mm", "< 45 years"],
-        "High Risk (Above)": ["> 140 mg/dL", "> 120 mm Hg", "> 24.9", "> 140 mu U/ml", "> 25 mm", "> 45 years"]
-    }
+    # HTML Custom Table
+    html_table = """
+    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; color: white; font-size: 16px;">
+        <tr style="background-color: #1a1a2e; color: #00e676;">
+            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">Feature</th>
+            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">Normal Range</th>
+            <th style="padding: 12px; border: 1px solid #00e676; text-align: left;">High Risk (Above)</th>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">Glucose</td>
+            <td style="padding: 12px; border: 1px solid #555;">&lt; 140 mg/dL</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 140 mg/dL</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">Blood Pressure</td>
+            <td style="padding: 12px; border: 1px solid #555;">&lt; 120 mm Hg</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 120 mm Hg</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">BMI</td>
+            <td style="padding: 12px; border: 1px solid #555;">18.5 - 24.9</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 24.9</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">Insulin</td>
+            <td style="padding: 12px; border: 1px solid #555;">&lt; 140 mu U/ml</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 140 mu U/ml</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">Skin Thickness</td>
+            <td style="padding: 12px; border: 1px solid #555;">&lt; 25 mm</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 25 mm</td>
+        </tr>
+        <tr>
+            <td style="padding: 12px; border: 1px solid #555;">Age</td>
+            <td style="padding: 12px; border: 1px solid #555;">&lt; 45 years</td>
+            <td style="padding: 12px; border: 1px solid #555;">&gt; 45 years</td>
+        </tr>
+    </table>
+    """
     
-    df_thresholds = pd.DataFrame(thresholds_data)
-    
-    # Table ko sundar tarike se dikhayein
-    st.table(df_thresholds)
+    st.markdown(html_table, unsafe_allow_html=True)
     
     st.warning("🚨 **Important:** If your values are in the 'High Risk' category, please consult a healthcare professional. Do not rely solely on this app for medical diagnosis.")
 
