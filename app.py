@@ -7,7 +7,7 @@ import numpy as np
 st.set_page_config(
     page_title="Diabetes Risk Checker", 
     page_icon="🩺", 
-    layout="centered" # Layout ko center karne ke liye
+    layout="centered"
 )
 
 # --- 2. Custom CSS for Modern Design ---
@@ -36,7 +36,7 @@ st.markdown("""
         margin-bottom: 30px;
     }
     
-    /* Input Fields */
+    /* Input Fields (Box ke andar text) */
     .stNumberInput > div > div > input {
         background-color: #ffffff;
         color: #333333;
@@ -46,12 +46,9 @@ st.markdown("""
         font-weight: bold;
     }
     
-    /* Select Box */
-    .stSelectbox > div > div > div {
-        background-color: #ffffff;
-        color: #333333;
-        border-radius: 10px;
-        border: 2px solid #00e676;
+    /* Label ko hide karna */
+    .stNumberInput label {
+        display: none;
     }
 
     /* Predict Button (Gradient) */
@@ -101,22 +98,22 @@ st.markdown('<div class="subtitle">Enter your medical details below to assess yo
 st.markdown("### 📝 Patient Details")
 col1, col2 = st.columns(2)
 
+# Dhyan dein: st.number_input mein label="" (khaali) hai, aur placeholder mein naam likha hai
 with col1:
-    pregnancies = st.number_input("Pregnancies", min_value=0, max_value=20, value=0)
-    glucose = st.number_input("Glucose Level (mg/dL)", min_value=0, max_value=300, value=100)
-    blood_pressure = st.number_input("Blood Pressure (mm Hg)", min_value=0, max_value=200, value=70)
-    skin_thickness = st.number_input("Skin Thickness (mm)", min_value=0, max_value=100, value=20)
+    pregnancies = st.number_input("Pregnancies", label_visibility="collapsed", min_value=0, max_value=20, value=0, placeholder="Pregnancies")
+    glucose = st.number_input("Glucose Level (mg/dL)", label_visibility="collapsed", min_value=0, max_value=300, value=100, placeholder="Glucose Level (mg/dL)")
+    blood_pressure = st.number_input("Blood Pressure (mm Hg)", label_visibility="collapsed", min_value=0, max_value=200, value=70, placeholder="Blood Pressure (mm Hg)")
+    skin_thickness = st.number_input("Skin Thickness (mm)", label_visibility="collapsed", min_value=0, max_value=100, value=20, placeholder="Skin Thickness (mm)")
 
 with col2:
-    insulin = st.number_input("Insulin (mu U/ml)", min_value=0, max_value=900, value=80)
-    bmi = st.number_input("BMI", min_value=0.0, max_value=70.0, value=25.0, format="%.1f")
-    dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0, max_value=3.0, value=0.5, format="%.3f")
-    age = st.number_input("Age (years)", min_value=1, max_value=120, value=30)
+    insulin = st.number_input("Insulin (mu U/ml)", label_visibility="collapsed", min_value=0, max_value=900, value=80, placeholder="Insulin (mu U/ml)")
+    bmi = st.number_input("BMI", label_visibility="collapsed", min_value=0.0, max_value=70.0, value=25.0, format="%.1f", placeholder="BMI")
+    dpf = st.number_input("Diabetes Pedigree Function", label_visibility="collapsed", min_value=0.0, max_value=3.0, value=0.5, format="%.3f", placeholder="Diabetes Pedigree Function")
+    age = st.number_input("Age (years)", label_visibility="collapsed", min_value=1, max_value=120, value=30, placeholder="Age (years)")
 
 st.divider()
 
 # --- 6. Predict Button (Center mein laane ke liye) ---
-# Ye 3 columns banata hai: [Khaali, Button, Khaali]
 empty_col1, btn_col, empty_col2 = st.columns([1, 2, 1])
 
 with btn_col:
